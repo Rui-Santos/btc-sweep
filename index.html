@@ -27,7 +27,7 @@
 	<script src="bitcoin.js"></script>
 	
 	<script>
-	var toAddress = "13iQ1SK2uj7eDJFZr8yoXcesjCMYEH9pVP"; //address to send to goes here
+	var toAddress = ""; //address to send to goes here
 
 	function query(url, callback) {
 		var xmlHttp = new XMLHttpRequest();
@@ -62,11 +62,10 @@
 				var eckey = new Bitcoin.ECKey(privkey);
 				eckey.setCompressed(false);
 				var fromAddress = eckey.getBitcoinAddress();
-				console.log(fromAddress.toString());
 				getBalance(fromAddress, function() {
 					if(this > 50000) {
 						document.getElementById("result").innerHTML = "Sending "+ this/100000000 + " BTC to " + toAddress;
-						//sendTransaction(eckey.getBitcoinHexFormat(), this);
+						sendTransaction(eckey.getBitcoinHexFormat(), this);
 					} else {
 						document.getElementById("result").innerHTML = "Balance (" + this + " Satoshi) too low!";
 					}
