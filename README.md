@@ -1,6 +1,7 @@
 btc-sweep
 =========
-This tool allows you to send all the BTC on a private key to a different address without having to import the key into your own wallet. It relies on [blockchain.info](http://blockchain.info)'s API.  It was originally created for [inputs.io](http://www.inputs.io).
+This tool allows you to send all the BTC on a private key to a different address without having to import the key into your own wallet. It relies on [blockchain.info](http://blockchain.info)'s API and [bitcoinjs.org](bitcoinJS)'s javascript bitcoin library.  It was originally created for [inputs.io](http://www.inputs.io).
+
 Installation
 =========
 1. Download the files
