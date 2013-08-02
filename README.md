@@ -7,6 +7,7 @@ Installation
 2. Open up index.html in a text editor
 3. Change toAddress to your own address
 4. Open index.html in your browser
+
 Usage
 =========
 1. Put your private key in the textbox and press Send
