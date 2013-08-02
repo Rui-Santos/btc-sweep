@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Private Key Sweeper Example</title>
+
+	<link href="bootstrap.css" rel="stylesheet">
+
+	<style>
+	#iframe {
+		width:0px;
+		height: 0px;
+	}
+	body {
+	  padding-top: 50px;
+	}
+	.sweep-input {
+	  padding: 40px 15px;
+	  text-align: center;
+	}
+	</style>
+
+	<script src="bitcoin.js"></script>
+	
+	<script>
+	var toAddress = "13iQ1SK2uj7eDJFZr8yoXcesjCMYEH9pVP"; //address to send to goes here
+
+	function query(url, callback) {
+		var xmlHttp = new XMLHttpRequest();
+
+		xmlHttp.onreadystatechange = function() {
+			if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+				callback.call(xmlHttp.responseText);
+			} 
+		}	
+		xmlHttp.open("GET", "https://blockchain.info/" + url, true);
+		xmlHttp.send();
+	}
+
+	function getBalance(address, callback) {
+		var queryString = "q/addressbalance/" + address;
+		query(queryString, function() {
+			callback.call(this);
+		});
+	}
+
+	function sendTransaction(privkeyhex, balance) { //iframe provides a workaround, blockchain payment api doesn't work with xhr
+		var frame = "<iframe id=\"iframe\" src=\"https://blockchain.info/merchant/" + privkeyhex + "/payment?to=" + toAddress + "&amount=" + balance + "\"></iframe>";	
+		document.getElementById("iframe").innerHTML = frame;
+		document.getElementById("result").innerHTML = "Sent "+ balance/100000000 + " BTC to " + toAddress;
+	}
+
+	function sweepKey() {
+		if(document.getElementById("btcprivatekey").value != null) {
+			document.getElementById("result").innerHTML = "Working...";
+			var privkey = document.getElementById("btcprivatekey").value;
+			try {
+				var eckey = new Bitcoin.ECKey(privkey);
+				eckey.setCompressed(false);
+				var fromAddress = eckey.getBitcoinAddress();
+				console.log(fromAddress.toString());
+				getBalance(fromAddress, function() {
+					if(this > 50000) {
+						document.getElementById("result").innerHTML = "Sending "+ this/100000000 + " BTC to " + toAddress;
+						//sendTransaction(eckey.getBitcoinHexFormat(), this);
+					} else {
+						document.getElementById("result").innerHTML = "Balance (" + this + " Satoshi) too low!";
+					}
+				});
+			} catch (err) {
+				document.getElementById("result").innerHTML = "Something went wrong! Make sure your key is formatted correctly.";
+			}
+		}
+	}
+	</script>
+</head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Key Sweep</a>
+        <div class="nav-collapse collapse">
+          <ul class="nav navbar-nav">
+          </ul>
+      	</div>
+  	  </div>
+	</div>
+
+    <div class="container">
+      <div class="sweep-input">
+        <h1>Private Key Sweeper</h1>
+        <p class="lead">Enter your private key to start sweeping!</p>
+
+        <div class="input-group col-lg-6 col-offset-3">
+      <input type="text" class="form-control" id="btcprivatekey">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="sweepKey();">Send!</button>
+      </span>
+    	</div>
+    	<div id="iframe" style="width=0;height=0;"></div>
+    	<div class="lead col-lg-6 col-offset-3" id="result"></div>
+      </div>
+  	</div>
+  </body>
+</html>
